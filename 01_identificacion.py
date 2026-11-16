@@ -21,38 +21,38 @@ def parsear_idn(respuesta):
 
 
 # ---- PRUEBAS (ASSERT) ----
+if __name__ == "__main__":
+    # Caso 1: Respuesta normal de un osciloscopio (4 campos)
+    assert parsear_idn("OWON ,ADS3202 ,25470803 ,V1.2.0") == {
+        "fabricante": "OWON",
+        "modelo": "ADS3202",
+        "serie": "25470803",
+        "version": "V1.2.0"
+    }
 
-# Caso 1: Respuesta normal de un osciloscopio (4 campos)
-assert parsear_idn("OWON ,ADS3202 ,25470803 ,V1.2.0") == {
-    "fabricante": "OWON",
-    "modelo": "ADS3202",
-    "serie": "25470803",
-    "version": "V1.2.0"
-}
+    # Caso 2: Respuesta normal de un multimetro (5 campos, descarta el ultimo)
+    assert parsear_idn("OWON ,XDM1041 ,25470803 ,V4.4.0 ,3") == {
+        "fabricante": "OWON",
+        "modelo": "XDM1041",
+        "serie": "25470803",
+        "version": "V4.4.0"
+    }
 
-# Caso 2: Respuesta normal de un multimetro (5 campos, descarta el ultimo)
-assert parsear_idn("OWON ,XDM1041 ,25470803 ,V4.4.0 ,3") == {
-    "fabricante": "OWON",
-    "modelo": "XDM1041",
-    "serie": "25470803",
-    "version": "V4.4.0"
-}
+    # Caso 3: Campos con espacios molestos de mas alrededor
+    assert parsear_idn(" OWON , ADS3202 , 25470803 , V1.2.0 ") == {
+        "fabricante": "OWON",
+        "modelo": "ADS3202",
+        "serie": "25470803",
+        "version": "V1.2.0"
+    }
 
-# Caso 3: Campos con espacios molestos de mas alrededor
-assert parsear_idn(" OWON , ADS3202 , 25470803 , V1.2.0 ") == {
-    "fabricante": "OWON",
-    "modelo": "ADS3202",
-    "serie": "25470803",
-    "version": "V1.2.0"
-}
+    # Caso 4 (Raro): Cadena vacia
+    assert parsear_idn("") is None
 
-# Caso 4 (Raro): Cadena vacia
-assert parsear_idn("") is None
+    # Caso 5 (Raro): Respuesta de error del instrumento
+    assert parsear_idn("ERROR: comando desconocido") is None
 
-# Caso 5 (Raro): Respuesta de error del instrumento
-assert parsear_idn("ERROR: comando desconocido") is None
+    # Caso 6 (Raro): Menos de 4 campos (faltan datos)
+    assert parsear_idn("OWON ,ADS3202 ,25470803") is None
 
-# Caso 6 (Raro): Menos de 4 campos (faltan datos)
-assert parsear_idn("OWON ,ADS3202 ,25470803") is None
-
-print("pruebas OK")
+    print("pruebas OK")

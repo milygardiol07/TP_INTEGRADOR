@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
+import math
+
 
 def a_numero(texto):
     # Usamos try/except porque si 'texto' es "ERROR" o "", float() daría error y frenaría el programa.
     try:
         # strip() saca espacios o saltos de línea que puedan venir pegados
-        return float(texto.strip())
+        valor = float(texto.strip())
     except (ValueError, AttributeError):
         # Si no se pudo convertir (ValueError) o si nos pasaron None en vez de texto (AttributeError)
         return None
+    # float("NaN") y float("inf") NO fallan, pero no son mediciones:
+    # "NaN" significa literalmente "no es un numero".
+    if not math.isfinite(valor):
+        return None
+    return valor
 
 
 def con_unidad(valor, unidad):
@@ -71,6 +78,13 @@ if __name__ == "__main__":
     assert a_numero("  2.837790E-01\n") == 0.283779
     assert a_numero("ERROR: comando desconocido") is None  # Caso raro: texto inválido
     assert a_numero("") is None  # Caso raro: cadena vacía
+    assert a_numero(None) is None  # Caso raro: no llegó respuesta
+    assert a_numero("2,003812") is None  # Caso raro: coma decimal (está en mediciones.log)
+    # Caso raro: float() acepta "NaN" e "inf" sin error; si a_numero los dejara
+    # pasar, un promedio posterior daría nan sin avisar.
+    assert a_numero("NaN") is None
+    assert a_numero("inf") is None
+    assert a_numero("-1.5E-03") == -0.0015  # negativos en notación científica
 
     # Pruebas de con_unidad (las de la tabla de la consigna)
     assert con_unidad(1000.0, "Hz") == "1 kHz"

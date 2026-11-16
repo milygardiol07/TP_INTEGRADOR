@@ -36,25 +36,25 @@ def validar(comando):
 
 
 # ---- PRUEBAS (ASSERT) ----
+if __name__ == "__main__":
+    # 1. Casos de exito (comandos perfectos que deben devolver None o True/False)
+    assert es_consulta(":MEASUrement:CH1:FREQuency?") == True
+    assert es_consulta(":CH1:DISPlay ON") == False
+    assert validar("*IDN?") is None
+    assert validar(":CH1:DISPlay ON") is None
 
-# 1. Casos de exito (comandos perfectos que deben devolver None o True/False)
-assert es_consulta(":MEASUrement:CH1:FREQuency?") == True
-assert es_consulta(":CH1:DISPlay ON") == False
-assert validar("*IDN?") is None
-assert validar(":CH1:DISPlay ON") is None
+    # 2. Casos que rompen reglas especificas
+    assert validar("") == "El comando no puede estar vacio"
+    assert validar("CH1:DISPlay ON") == "El comando debe empezar con ':' o con '*'"
+    assert validar(":CH1:  DISPlay ON") == "No hay dos espacios seguidos"
+    assert validar(":CH1:DISPlay??") == "Hay a lo sumo un '?'"
+    assert validar(":CH1:DIS?Play") == "El '?' va al final"
 
-# 2. Casos que rompen reglas especificas
-assert validar("") == "El comando no puede estar vacio"
-assert validar("CH1:DISPlay ON") == "El comando debe empezar con ':' o con '*'"
-assert validar(":CH1:  DISPlay ON") == "No hay dos espacios seguidos"
-assert validar(":CH1:DISPlay??") == "Hay a lo sumo un '?'"
-assert validar(":CH1:DIS?Play") == "El '?' va al final"
+    # 3. Validaciones de argumentos para ordenes (2 espacios o 0 espacios)
+    assert validar(":CH1:SCALe 1 v") == "Una orden lleva un solo argumento"
+    assert validar(":CH1:DISPlay") == "Una orden lleva un solo argumento"
 
-# 3. Validaciones de argumentos para ordenes (2 espacios o 0 espacios)
-assert validar(":CH1:SCALe 1 v") == "Una orden lleva un solo argumento"
-assert validar(":CH1:DISPlay") == "Una orden lleva un solo argumento"
+    # 4. Validaciones de argumentos para consultas (con un espacio de mas)
+    assert validar(":CH1:DISPlay ON?") == "Una consulta no lleva argumento"
 
-# 4. Validaciones de argumentos para consultas (con un espacio de mas)
-assert validar(":CH1:DISPlay ON?") == "Una consulta no lleva argumento"
-
-print("pruebas OK")
+    print("pruebas OK")

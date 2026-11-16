@@ -118,33 +118,14 @@ if __name__ == "__main__":
     # -- control con la serie de verdad --
     # Promedio de la frecuencia de CH1 en mediciones.log a menos del 0,5 %
     # de 1000 Hz y desvio menor que 5 Hz.
-    # Este lector minimo existe para que el ejercicio 9 corra solo; la
-    # lectura completa (con todas las reglas de rechazo) es la del ejercicio 8.
-    def frecuencias_ch1(ruta):
-        serie = []
-        with open(ruta, encoding="utf-8") as archivo:
-            for linea in archivo:
-                campos = linea.split()               # sin argumento: tambien parte por tabs
-                if len(campos) != 6 or campos[0].startswith("#"):
-                    continue
-                if campos[3] != "CH1" or campos[4] != "FREQ":
-                    continue
-                hora = campos[1].split(":")
-                if (len(hora) != 3 or not all(h.isdigit() for h in hora) or
-                        int(hora[0]) > 23 or int(hora[1]) > 59 or int(hora[2]) > 59):
-                    continue
-                try:
-                    valor = float(campos[5])
-                except ValueError:
-                    continue
-                if es_numero(valor):
-                    serie.append(valor)
-        return serie
+    # La serie sale del ejercicio 8: si este control falla, el error esta alla.
+    leer_log = __import__("08_log").leer_log
 
     carpeta = os.path.dirname(os.path.abspath(__file__))
     ruta_log = os.path.join(carpeta, "mediciones.log")
     if os.path.exists(ruta_log):
-        control = resumen(frecuencias_ch1(ruta_log))
+        series, _ = leer_log(ruta_log)
+        control = resumen(series.get(("ADS3202", "CH1", "FREQ"), []))
         assert control is not None
         # 20 tandas de CH1 a intervalos de 15 s + la linea separada con
         # tabulaciones (09:17:31). Si sale 20, se perdio el dato del tab.
